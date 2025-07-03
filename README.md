@@ -1,7 +1,10 @@
 # KiCAD Tools
 
 ## create-prod-files.sh
-Executed inside a KiCAD project. It will do the following;
+It will create all the needed production files for PCB manufacturing and PCB assembly, primarily focused on JLCPCB.
+Each Revision is generated in full, inside the revision directory, and is expected to be committed to Git, perhaps
+with the exception of the Gerber and Drill files, which exists inside a Zip file. Set that up with `.gitignore` if
+those files shouldn't be committed to Git.
 
 * Expectations;
   * Revisions are "A", "B", "C" or "A1", "B1", "B2" or similar.
