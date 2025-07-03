@@ -37,8 +37,9 @@ else
 fi
 
 CURRENT_DATE=$(date +%Y-%m-%d)
-filename="$NAME.kicad_pro" 
-sed -i "s/\"DATE\": \".*\"/\"DATE\": \"$CURRENT_DATE\"/" "$filename"
+sed -i "s/\"DATE\": \".*\"/\"DATE\": \"$CURRENT_DATE\"/" "$NAME.kicad_pro"
+sed -i "s/[(]date \".*\"/(date \"$CURRENT_DATE\"/" "$NAME.kicad_sch"
+sed -i "s/[(]date \".*\"/(date \"$CURRENT_DATE\"/" "$NAME.kicad_pcb"
 
 PDF_SCH=$REVISION/$NAME-$REVISION-schematics.pdf
 PDF_PCB=$REVISION/$NAME-$REVISION-pcb

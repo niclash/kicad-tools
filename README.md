@@ -15,7 +15,7 @@ those files shouldn't be committed to Git.
 * Extracts the Revision from the either the Project "REVISION" variable or from the "Revision" field in Page Settings.
   If the latter, it will make sure that both Revisions are identical. 
     
-* Sets the "DATE" to current date in both Schematics and PCB.
+* Sets the "Date" field to current date in both Schematics and PCB page settings.
 
 * Create a directory named "Rev${REVISION}", and store all generated outputs in that directory.
 
