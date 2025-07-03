@@ -24,7 +24,8 @@ Executed inside a KiCAD project. It will do the following;
   * PCB with outer layers only, useful for manufacturing.
   * PCB with all "useful" layers. I.e. remove Fab, Courtyard, Margin, User-ECO*, User_Comment and Adhesive.
   
-* (Optional) Generate 3D model (STEP or GLB/GLTF). Put "GEN_3D" as an argument, example `GEN_3D=GLB create-prod-files.sh`
+* (Optional) Generate 3D model (STEP or GLB/GLTF). 
+  Put "GEN_3D" as an argument with either "STEP" or "GLB" as the value, example `GEN_3D=GLB create-prod-files.sh`
 
 
 
