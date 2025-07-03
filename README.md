@@ -16,7 +16,7 @@ Executed inside a KiCAD project. It will do the following;
 
 * Generate a component placement file, (only Top side). CSV format is for JLCPCB.
 
-* Generate BOM.csv. Expects a JLCPCB template in the project.
+* Generate BOM.csv. Expects a "JLCPCB" preset in the project.
 
 * Generate PDFs
   * Schematics
