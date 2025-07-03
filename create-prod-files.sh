@@ -36,17 +36,17 @@ BOM=$REVISION/$NAME-$REVISION-bom.csv
 kicad-cli pcb export gerbers --output $REVISION/ --use-drill-file-origin --no-protel-ext $NAME.kicad_pcb
 
 # Remove unwanted layers
-rm $REVISION/$NAME-F_Adhesive.gbr
-rm $REVISION/$NAME-B_Adhesive.gbr
-rm $REVISION/$NAME-User_Comments.gbr
-rm $REVISION/$NAME-User_Eco1.gbr
-rm $REVISION/$NAME-User_Eco2.gbr
-rm $REVISION/$NAME-Margin.gbr
-rm $REVISION/$NAME-F_Courtyard.gbr
-rm $REVISION/$NAME-B_Courtyard.gbr
-rm $REVISION/$NAME-F_Fab.gbr
-rm $REVISION/$NAME-B_Fab.gbr
-rm `ls $REVISION/*.gbr | grep "User_[0-9]+*"`
+rm $REVISION/$NAME-F_Adhesive.gbr 2>/dev/null
+rm $REVISION/$NAME-B_Adhesive.gbr 2>/dev/null
+rm $REVISION/$NAME-User_Comments.gbr 2>/dev/null
+rm $REVISION/$NAME-User_Eco1.gbr 2>/dev/null
+rm $REVISION/$NAME-User_Eco2.gbr 2>/dev/null
+rm $REVISION/$NAME-Margin.gbr 2>/dev/null
+rm $REVISION/$NAME-F_Courtyard.gbr 2>/dev/null
+rm $REVISION/$NAME-B_Courtyard.gbr 2>/dev/null
+rm $REVISION/$NAME-F_Fab.gbr 2>/dev/null
+rm $REVISION/$NAME-B_Fab.gbr 2>/dev/null
+rm `ls $REVISION/*.gbr | grep "User_[0-9]+*"` 2>/dev/null
 
 kicad-cli pcb export drill --output $REVISION/ --drill-origin plot $NAME.kicad_pcb
 
@@ -77,7 +77,13 @@ kicad-cli pcb export pos --output $REVISION/$NAME-$REVISION-pos.csv --format csv
 sed -i.bak "1 s/.*/Designator,Val,Package,MidX,MidY,Rotation,Layer/" $REVISION/$NAME-$REVISION-pos.csv
 rm $REVISION/*.csv.bak
 
-# kicad-cli pcb export glb --output $REVISION/$NAME-$REVISION-3d.step --force --drill-origin --no-dnp $NAME.kicad_pcb
+if [ ".$GEN_3D" = ".STEP" ] ; then
+  kicad-cli pcb export step --output $REVISION/$NAME-$REVISION-3d.step --force --drill-origin --no-dnp $NAME.kicad_pcb
+fi
+
+if [ ".$GEN_3D" = ".GLB" ] ; then
+  kicad-cli pcb export glb --output $REVISION/$NAME-$REVISION-3d.glb --force --drill-origin --no-dnp $NAME.kicad_pcb
+fi
 
 kicad-cli sch export pdf --output $PDF_SCH $NAME.kicad_sch
 kicad-cli sch export bom --output $BOM --ref-range-delimiter "" --preset JLCPCB $NAME.kicad_sch
