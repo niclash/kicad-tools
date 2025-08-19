@@ -27,6 +27,9 @@ those files shouldn't be committed to Git.
 
 * Generate BOM.csv
 
+* Generate SVGs
+  * One SVG per sheet
+
 * Generate PDFs
   * Schematics
   * PCB with outer layers only, useful for manufacturing.

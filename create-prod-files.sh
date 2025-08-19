@@ -42,6 +42,7 @@ sed -i "s/[(]date \".*\"/(date \"$CURRENT_DATE\"/" "$NAME.kicad_sch"
 sed -i "s/[(]date \".*\"/(date \"$CURRENT_DATE\"/" "$NAME.kicad_pcb"
 
 PDF_SCH=$REVISION/$NAME-$REVISION-schematics.pdf
+SVG_SCH=$REVISION/$NAME-$REVISION-schematics.svg
 PDF_PCB=$REVISION/$NAME-$REVISION-pcb
 PDF_PCBFULL=$REVISION/$NAME-$REVISION-pcb-full.pdf
 PDF_PCBCUSTOMER=$REVISION/$NAME-$REVISION-pcb.pdf
@@ -100,4 +101,5 @@ if [ ".$GEN_3D" = ".GLB" ] ; then
 fi
 
 kicad-cli sch export pdf --output $PDF_SCH $NAME.kicad_sch
+kicad-cli sch export svg --output $SVG_SCH $NAME.kicad_sch
 kicad-cli sch export bom --output $BOM --ref-range-delimiter "" --preset JLCPCB $NAME.kicad_sch
