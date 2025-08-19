@@ -102,4 +102,8 @@ fi
 
 kicad-cli sch export pdf --output $PDF_SCH $NAME.kicad_sch
 kicad-cli sch export svg --output $SVG_SCH $NAME.kicad_sch
-kicad-cli sch export bom --output $BOM --ref-range-delimiter "" --preset JLCPCB $NAME.kicad_sch
+
+
+# "Reference","Qty","Value","DNP","Exclude from BOM","Exclude from Board","Footprint","LCSC","xxx"
+
+kicad-cli sch export bom --output $BOM --fields='Reference,${QUANTITY},Value,Footprint,LCSC' --labels='Designator,Qty,Value,Footprint,LCSC'  --exclude-dnp --group-by='Value,Footprint,LCSC' --ref-range-delimiter ""  $NAME.kicad_sch
