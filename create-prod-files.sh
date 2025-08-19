@@ -15,7 +15,7 @@
 #    limitations under the License.
 
 NAME=`basename $PWD`
-REV_PRO=`cat *.kicad_pro | grep REVISION | sed 's/.*: \"//' | sed 's/\"//'`
+REV_PRO=`cat *.kicad_pro | grep REVISION | sed 's/.*: \"//' | sed 's/\".*//'`
 if [ -z "$REV_PRO" ] ; then
   PCB_REV=`grep '(rev' $NAME.kicad_pcb | sed 's/.*rev "//' | sed 's/".*//'`
   SCH_REV=`grep '(rev' $NAME.kicad_sch | sed 's/.*rev "//' | sed 's/".*//'`
