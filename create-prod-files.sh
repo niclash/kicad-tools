@@ -47,8 +47,19 @@ PDF_PCB=$REVISION/$NAME-$REVISION-pcb
 PDF_PCBFULL=$REVISION/$NAME-$REVISION-pcb-full.pdf
 PDF_PCBCUSTOMER=$REVISION/$NAME-$REVISION-pcb.pdf
 BOM=$REVISION/$NAME-$REVISION-bom.csv
+DRC_OUT=$REVISION/$NAME-$REVISION-drc
+
+echo -n "Running DRC check..."
+kicad-cli pcb drc --output $DRC_OUT.txt --severity-error --severity-warning --exit-code-violations $NAME.kicad_pcb
+if [ "$?" != 0 ] ; then
+  echo "DRC check failed."
+  exit 1
+fi
+kicad-cli pcb drc --output $DRC_OUT.json --format json --severity-all $NAME.kicad_pcb
 
 kicad-cli pcb export gerbers --output $REVISION/ --use-drill-file-origin --no-protel-ext $NAME.kicad_pcb
+
+echo "DRC check... Ok"
 
 # Remove unwanted layers
 rm $REVISION/$NAME-F_Adhesive.gbr 2>/dev/null
