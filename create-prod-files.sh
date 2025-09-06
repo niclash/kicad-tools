@@ -48,6 +48,15 @@ PDF_PCBFULL=$REVISION/$NAME-$REVISION-pcb-full.pdf
 PDF_PCBCUSTOMER=$REVISION/$NAME-$REVISION-pcb.pdf
 BOM=$REVISION/$NAME-$REVISION-bom.csv
 DRC_OUT=$REVISION/$NAME-$REVISION-drc
+ERC_OUT=$REVISION/$NAME-$REVISION-erc
+
+echo -n "Running ERC check..."
+kicad-cli sch erc --output $ERC_OUT.txt --severity-error --severity-warning --exit-code-violations $NAME.kicad_sch
+if [ "$?" != 0 ] ; then
+  echo "ERC check failed."
+  exit 1
+fi
+kicad-cli sch erc --output $ERC_OUT.json --format json --severity-all $NAME.kicad_sch
 
 echo -n "Running DRC check..."
 kicad-cli pcb drc --output $DRC_OUT.txt --severity-error --severity-warning --exit-code-violations $NAME.kicad_pcb
