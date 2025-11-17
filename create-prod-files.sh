@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #    Copyright 2025 Niclas Hedhman
 #
@@ -49,6 +49,25 @@ PDF_PCBCUSTOMER=$REVISION/$NAME-$REVISION-pcb.pdf
 BOM=$REVISION/$NAME-$REVISION-bom.csv
 DRC_OUT=$REVISION/$NAME-$REVISION-drc
 ERC_OUT=$REVISION/$NAME-$REVISION-erc
+PROD_SPEC=$REVISION/$NAME-prodspec.csv
+
+declare -A finish_map
+finish_map["None"]="HASL"
+finish_map["Not Specified"]="HASL"
+finish_map["ENIG"]="ENIG"
+finish_map["ENEPIG"]="ENIG"
+finish_map["HAL SnPb"]="HASL"
+finish_map["HAL lead-free"]="LeadFree HASL"
+finish_map["Hard Gold"]="ENIG"
+finish_map["Immersion tin"]="HASL"
+finish_map["Immersion nickel"]="ENIG"
+finish_map["Immersion silver"]="ENIG"
+finish_map["Immersion gold"]="ENIG"
+finish_map["HT_OSP"]="ENIG"
+finish_map["OSP"]="ENIG"
+finish_map["User defined"]="ENIG"
+
+
 
 echo -n "Running ERC check..."
 kicad-cli sch erc --output $ERC_OUT.txt --severity-error --severity-warning --exit-code-violations $NAME.kicad_sch
@@ -66,9 +85,23 @@ if [ "$?" != 0 ] ; then
 fi
 kicad-cli pcb drc --output $DRC_OUT.json --format json --severity-all $NAME.kicad_pcb
 
+echo "DRC check... Ok"
+
+echo "Name,Value" >$PROD_SPEC
+echo -n "Color," >>$PROD_SPEC
+grep -A2 "layer...\.Mask" jolt_buck3v5a.kicad_pcb | grep color | head -1 | sed 's/.*color "//' | sed 's/")//'  >>$PROD_SPEC
+echo -n "Thickness," >>$PROD_SPEC
+grep "thickness" jolt_buck3v5a.kicad_pcb | head -1 | sed 's/.*.thickness //' | sed 's/)//' >>$PROD_SPEC
+echo -n "Finish," >>$PROD_SPEC
+FINISH=`grep "copper_finish" jolt_buck3v5a.kicad_pcb | sed s'/.*copper_finish "//' | sed 's/")//'`
+echo $FINISH
+echo "${finish_map[${FINISH}]}" >>$PROD_SPEC
+echo "Mark, 2D barcode & Number | QR Code | ${NAME}_0001 | 10*10mm" >>$PROD_SPEC
+echo -n "Min hole size," >>$PROD_SPEC
+grep drill jolt_buck3v5a.kicad_pcb | grep -v drillshape | sed 's/^[[:space:]]*(drill //' | sed 's/)//' | sort -u | head -1 >>$PROD_SPEC
+
 kicad-cli pcb export gerbers --output $REVISION/ --use-drill-file-origin --no-protel-ext $NAME.kicad_pcb
 
-echo "DRC check... Ok"
 
 # Remove unwanted layers
 rm $REVISION/$NAME-F_Adhesive.gbr 2>/dev/null
@@ -124,6 +157,7 @@ kicad-cli sch export pdf --output $PDF_SCH $NAME.kicad_sch
 kicad-cli sch export svg --output $SVG_SCH $NAME.kicad_sch
 
 
-# "Reference","Qty","Value","DNP","Exclude from BOM","Exclude from Board","Footprint","LCSC","xxx"
-
 kicad-cli sch export bom --output $BOM --fields='Reference,${QUANTITY},Value,Footprint,LCSC' --labels='Designator,Qty,Value,Footprint,LCSC'  --exclude-dnp --group-by='Value,Footprint,LCSC' --ref-range-delimiter ""  $NAME.kicad_sch
+
+
+echo "See $PROD_SPEC for production settings." >>$REVISION/README.txt
