@@ -89,16 +89,16 @@ echo "DRC check... Ok"
 
 echo "Name,Value" >$PROD_SPEC
 echo -n "Color," >>$PROD_SPEC
-grep -A2 "layer...\.Mask" jolt_buck3v5a.kicad_pcb | grep color | head -1 | sed 's/.*color "//' | sed 's/")//'  >>$PROD_SPEC
+grep -A2 "layer...\.Mask" $NAME.kicad_pcb | grep color | head -1 | sed 's/.*color "//' | sed 's/")//'  >>$PROD_SPEC
 echo -n "Thickness," >>$PROD_SPEC
-grep "thickness" jolt_buck3v5a.kicad_pcb | head -1 | sed 's/.*.thickness //' | sed 's/)//' >>$PROD_SPEC
+grep "thickness" $NAME.kicad_pcb | head -1 | sed 's/.*.thickness //' | sed 's/)//' >>$PROD_SPEC
 echo -n "Finish," >>$PROD_SPEC
-FINISH=`grep "copper_finish" jolt_buck3v5a.kicad_pcb | sed s'/.*copper_finish "//' | sed 's/")//'`
+FINISH=`grep "copper_finish" $NAME.kicad_pcb | sed s'/.*copper_finish "//' | sed 's/")//'`
 echo $FINISH
 echo "${finish_map[${FINISH}]}" >>$PROD_SPEC
 echo "Mark, 2D barcode & Number | QR Code | ${NAME}_0001 | 10*10mm" >>$PROD_SPEC
 echo -n "Min hole size," >>$PROD_SPEC
-grep drill jolt_buck3v5a.kicad_pcb | grep -v drillshape | sed 's/^[[:space:]]*(drill //' | sed 's/)//' | sort -u | head -1 >>$PROD_SPEC
+grep drill $NAME.kicad_pcb | grep -v drillshape | sed 's/^[[:space:]]*(drill //' | sed 's/)//' | sort -u | head -1 >>$PROD_SPEC
 
 kicad-cli pcb export gerbers --output $REVISION/ --use-drill-file-origin --no-protel-ext $NAME.kicad_pcb
 
