@@ -10,14 +10,12 @@ those files shouldn't be committed to Git.
   * Revisions are "A", "B", "C" or "A1", "B1", "B2" or similar.
   * Executions has the KiCAD project directory as $PWD/$CWD
   * The name of the directory is the same name as the KiCAD project files.
-  * A BOM preset exists called "JLCPCB"
   
-* Extracts the Revision from the either the Project "REVISION" variable or from the "Revision" field in Page Settings.
-  If the latter, it will make sure that both Revisions are identical. 
+* Extracts the Revision a "Text Variable" named "REVISION" from the project file. 
     
 * Sets the "Date" field to current date in both Schematics and PCB page settings.
 
-* Create a directory named "Rev${REVISION}", and store all generated outputs in that directory.
+* Create a directory named "rev_${REVISION}", and store all generated outputs in that directory.
 
 * Generate the Gerber and Drill files.
 

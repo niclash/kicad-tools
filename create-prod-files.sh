@@ -15,7 +15,8 @@
 #    limitations under the License.
 
 NAME=`basename $PWD`
-REV_PRO=`cat *.kicad_pro | grep REVISION | sed 's/.*: \"//' | sed 's/\".*//'`
+REV_PRO=`cat *.kicad_pro | grep \"REVISION\" | sed 's/.*: \"//' | sed 's/\".*//'`
+# Handle legacy where REVISION in page settings were used.
 if [ -z "$REV_PRO" ] ; then
   PCB_REV=`grep '(rev' $NAME.kicad_pcb | sed 's/.*rev "//' | sed 's/".*//'`
   SCH_REV=`grep '(rev' $NAME.kicad_sch | sed 's/.*rev "//' | sed 's/".*//'`
@@ -23,10 +24,12 @@ if [ -z "$REV_PRO" ] ; then
     echo "Revision is not set equal in PCB ($PCB_REV) and Schematics ($SCH_REV)"
     exit
   fi
-  REVISION=Rev$PCB_REV
+  REVISION=rev_$PCB_REV
 else
-  REVISION=Rev$REV_PRO
+  REVISION=rev_$REV_PRO
 fi
+echo $PCB_REV
+echo $SCH_REV
 
 if [ -d $REVISION ] ; then
   echo "$REVISION already exists. Manually remove directory if regenerating the outputs."
@@ -50,6 +53,10 @@ BOM=$REVISION/$NAME-$REVISION-bom.csv
 DRC_OUT=$REVISION/$NAME-$REVISION-drc
 ERC_OUT=$REVISION/$NAME-$REVISION-erc
 PROD_SPEC=$REVISION/$NAME-prodspec.csv
+RENDER1=$REVISION/${NAME}_top_render.png
+RENDER2=$REVISION/${NAME}_top_left_render.png
+RENDER3=$REVISION/${NAME}_top_right_render.png
+RENDER4=$REVISION/${NAME}_bot_render.png
 
 declare -A finish_map
 finish_map["None"]="HASL"
@@ -145,6 +152,10 @@ kicad-cli pcb export pos --output $REVISION/$NAME-$REVISION-pos.csv --format csv
 sed -i.bak "1 s/.*/Designator,Val,Package,MidX,MidY,Rotation,Layer/" $REVISION/$NAME-$REVISION-pos.csv
 rm $REVISION/*.csv.bak
 
+if [ ".$GEN_3D" = "." ] ; then
+  GEN_3D="STEP"
+fi
+
 if [ ".$GEN_3D" = ".STEP" ] ; then
   kicad-cli pcb export step --output $REVISION/$NAME-$REVISION-3d.step --force --drill-origin --no-dnp $NAME.kicad_pcb
 fi
@@ -153,11 +164,16 @@ if [ ".$GEN_3D" = ".GLB" ] ; then
   kicad-cli pcb export glb --output $REVISION/$NAME-$REVISION-3d.glb --force --drill-origin --no-dnp $NAME.kicad_pcb
 fi
 
-kicad-cli sch export pdf --output $PDF_SCH $NAME.kicad_sch
-kicad-cli sch export svg --output $SVG_SCH $NAME.kicad_sch
+kicad-cli sch export pdf --no-background-color --output $PDF_SCH $NAME.kicad_sch
+kicad-cli sch export svg --no-background-color --output $SVG_SCH $NAME.kicad_sch
 
 
 kicad-cli sch export bom --output $BOM --fields='Reference,${QUANTITY},Value,Footprint,LCSC' --labels='Designator,Qty,Value,Footprint,LCSC'  --exclude-dnp --group-by='Value,Footprint,LCSC' --ref-range-delimiter ""  $NAME.kicad_sch
+
+kicad-cli pcb render --use-board-stackup-colors --width=1920 --height=1080 --quality=high --light-side="0.5" --perspective --side=top --rotate="0,0,0" --output=$RENDER1 $NAME.kicad_pcb
+kicad-cli pcb render --use-board-stackup-colors --width=1920 --height=1080 --quality=high --light-side="0.5" --perspective --side=top --rotate="330,0,30" --output=$RENDER2 $NAME.kicad_pcb
+kicad-cli pcb render --use-board-stackup-colors --width=1920 --height=1080 --quality=high --light-side="0.5" --perspective --side=top --rotate="330,0,330" --output=$RENDER3 $NAME.kicad_pcb
+kicad-cli pcb render --use-board-stackup-colors --width=1920 --height=1080 --quality=high --light-side="0.5" --perspective --side=top --rotate="180,0,180" --output=$RENDER4 $NAME.kicad_pcb
 
 
 echo "See $PROD_SPEC for production settings." >>$REVISION/README.txt
